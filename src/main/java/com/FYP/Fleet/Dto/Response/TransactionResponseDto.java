@@ -4,6 +4,7 @@ import com.FYP.Fleet.Enums.Method;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Builder
 @Getter
@@ -19,5 +20,6 @@ public class TransactionResponseDto {
     private Long ownerId;
     private String ownerName;
     private Method method;
+    private LocalDateTime recordDateTime;
 
 }

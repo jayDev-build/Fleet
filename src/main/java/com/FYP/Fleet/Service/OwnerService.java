@@ -36,10 +36,11 @@ public class OwnerService {
 
         User user = userService.getUserById(userId);
 
-        Owner owner = new Owner();
-        owner.setName(request.getName());
-        owner.setPhone(request.getPhone());
-        owner.setUser(user);
+        Owner owner = Owner.builder()
+                .name(request.getName())
+                .phone(request.getPhone())
+                .user(user)
+                .build();
 
         Owner saved = ownerRepository.save(owner);
         return mapToResponse(saved);
@@ -66,7 +67,6 @@ public class OwnerService {
         List<Trip> trips = tripService
                 .getTripsByUserIdAndOwnerId(userId, ownerId);
 
-        List<Trip> unSettledTrips = trips.stream().filter(t -> !t.getSettled()).toList();
 
         long totalAdvance = transactionsList.stream().mapToLong(TransactionResponseDto::getAmount).sum();
         long totalPay = trips.stream().mapToLong(Trip::getOwnerRate).sum();
@@ -90,29 +90,6 @@ public class OwnerService {
         return dto;
     }
 
-    private TripSummaryDto mapToTripSummary(Trip trip) {
-        Long totalExpense = trip.getExpenseList().stream().mapToLong(Expense::getAmount).sum();
-        return TripSummaryDto.builder()
-                .tripId(trip.getId())
-                .vehicleNumber(trip.getVehicle().getNumber())
-                .source(trip.getSource())
-                .destination(trip.getDestination())
-                .startDate(trip.getStartDate())
-                .endDate(trip.getEndDate())
-                .freightPrice(trip.getFreightPrice())
-                .totalExpense(totalExpense)
-                .profit(trip.getFreightPrice() - totalExpense)
-                .status(trip.getStatus())
-                .build();
-    }
-
-    private long sumByType(List<Expense> expenses, ExpenseType type) {
-        return expenses.stream()
-                .filter(e -> e.getExpenseType() == type)
-                .mapToLong(Expense::getAmount)
-                .sum();
-    }
-
     private OwnerResponseDto mapToResponse(Owner owner) {
         OwnerResponseDto dto = new OwnerResponseDto();
         dto.setOwnerId(owner.getId());
@@ -134,11 +111,37 @@ public class OwnerService {
                 .destination(trip.getDestination())
                 .settled(trip.getSettled())
                 .vehicleNumber(trip.getVehicle().getNumber())
-                .advance(trip.getOwnerAdvance())
+//                .advance(trip.getOwnerAdvance())
                 .build();
     }
 
     public Owner getOwnerById(Long ownerId) throws UserPrincipalNotFoundException {
         return ownerRepository.findById(ownerId).orElseThrow(()-> new UserPrincipalNotFoundException("Owner Id Invalid"));
+    }
+
+    public Owner getOwnerByVehicleNumber(String vehicleNumber){
+        return ownerRepository.findByVehicleNumber(vehicleNumber);
+    }
+    private TripSummaryDto mapToTripSummary(Trip trip) {
+        Long totalExpense = trip.getExpenseList().stream().mapToLong(Expense::getAmount).sum();
+        return TripSummaryDto.builder()
+                .tripId(trip.getId())
+                .vehicleNumber(trip.getVehicle().getNumber())
+                .source(trip.getSource())
+                .destination(trip.getDestination())
+                .startDate(trip.getStartDate())
+                .endDate(trip.getEndDate())
+                .freightPrice(trip.getFreightPrice())
+                .totalExpense(totalExpense)
+                .profit(trip.getFreightPrice() - totalExpense)
+                .status(trip.getStatus())
+                .build();
+    }
+
+    private long sumByType(List<Expense> expenses, ExpenseType type) {
+        return expenses.stream()
+                .filter(e -> e.getExpenseType() == type)
+                .mapToLong(Expense::getAmount)
+                .sum();
     }
 }

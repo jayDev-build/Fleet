@@ -44,7 +44,7 @@ public class TripController {
 
     @GetMapping("/")
     public ResponseEntity<List<MiniTripResponseDto>> getAllTripsOfUser(@AuthenticationPrincipal SecurityUser securityUser){
-        List<MiniTripResponseDto> trips = tripService.getTripsOfOwner(securityUser.getId());
+        List<MiniTripResponseDto> trips = tripService.getTripsOfUser(securityUser.getId());
         return ResponseEntity.status(HttpStatus.OK).body(trips);
     }
 

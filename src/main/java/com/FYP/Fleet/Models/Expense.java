@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity(name = "Expense")
 @Builder
@@ -44,4 +45,6 @@ public class Expense {
 
     @NotNull
     private Long amount;
+
+    private LocalDateTime recordDateTime;
 }

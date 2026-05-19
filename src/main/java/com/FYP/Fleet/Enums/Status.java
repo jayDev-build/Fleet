@@ -4,8 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum Status {
-    ACTIVE(1, "Active"),
-    COMPLETED(2, "Completed");
+    CREATED(1, "Created"),
+    ACTIVE(2, "Active"),
+    COMPLETED(3, "Completed");
 
     private final int id;
     private final String label;

@@ -6,12 +6,13 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Builder
 @Entity
 @Table(name = "owner")
-//@Builder
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Owner {
 
     @Id
@@ -30,6 +31,9 @@ public class Owner {
     @Column(nullable = false)
     private String phone;
 
+    @Builder.Default
+    private Long amountToReceive = 0L;
+
     // Which fleet operator manages this owner
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -40,6 +44,5 @@ public class Owner {
     private List<Vehicle> vehicles = new ArrayList<>();
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @Builder.Default
     private List<Transactions> transactionsList = new ArrayList<>();
 }

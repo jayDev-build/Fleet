@@ -83,7 +83,6 @@ public class VehicleService {
         );
     }
 
-
     public List<VehicleResponseDto> getAllVehicleByUserId(Long userId) {
         List<Vehicle> vehicleList = vehicleRepository.findByUserId(userId);
         return vehicleList.stream().map(this::getVehicleResponse).toList();
@@ -108,4 +107,5 @@ public class VehicleService {
                         .vehicleNumber(v.getNumber())
                         .build()).toList();
     }
+
 }

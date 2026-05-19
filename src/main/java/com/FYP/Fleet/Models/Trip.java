@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +61,8 @@ public class Trip {
 
     private LocalDate endDate;
 
+    private LocalDateTime recordDateTime;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
@@ -68,8 +71,8 @@ public class Trip {
     @Column(name = "owner_rate")
     private Long ownerRate;
 
-    @Column(name = "owner_advance")
-    private Long ownerAdvance;
+//    @Column(name = "owner_advance")
+//    private Long ownerAdvance;
 
     @Column(name = "settled")
     @Builder.Default

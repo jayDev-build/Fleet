@@ -27,4 +27,6 @@ public interface OwnerRepository extends JpaRepository<Owner, Long> {
     """)
     Optional<Owner> findByIdAndUserId(Long ownerId, Long userId);
 
+    @Query("SELECT o FROM Owner o JOIN o.vehicles v WHERE v.number = :vehicleNumber")
+    Owner findByVehicleNumber(@Param("vehicleNumber") String vehicleNumber);
 }
