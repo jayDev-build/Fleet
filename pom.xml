@@ -99,6 +99,14 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- Twilio -->
+		<dependency>
+			<groupId>com.twilio.sdk</groupId>
+			<artifactId>twilio</artifactId>
+			<version>10.1.0</version> <!-- Replace with the latest version -->
+		</dependency>
+
+
 	</dependencies>
 
 	<build>

@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -40,6 +42,7 @@ public class ExpenseService {
                 .note(expenseRequestDto.getNote())
                 .amount(expenseRequestDto.getAmount())
                 .date(expenseRequestDto.getDate())
+                .recordDateTime(LocalDateTime.now())
                 .build();
 
         expense = expenseRepository.save(expense);
@@ -52,16 +55,6 @@ public class ExpenseService {
         Expense expense = expenseRepository.findById(expenseId)
                 .orElseThrow(() -> new RuntimeException("Expense Not Found"));
         return getExpenseResponse(expense);
-
-    }
-
-    public void updateResponse(long expenseId, ExpenseRequestDto expenseRequestDto){
-        Expense expense = getExpenseById(expenseId);
-        if(expenseRequestDto.getExpenseType() != null) expense.setExpenseType(expenseRequestDto.getExpenseType());
-        if(expenseRequestDto.getNote() != null) expense.setNote(expenseRequestDto.getNote());
-        if(expenseRequestDto.getDate() != null) expense.setDate(expenseRequestDto.getDate());
-        if(expenseRequestDto.getAmount() != null) expense.setAmount(expenseRequestDto.getAmount());
-        expenseRepository.save(expense);
 
     }
 
@@ -116,6 +109,7 @@ public class ExpenseService {
         if(updateExpenseRequestDto.getExpenseType() != null) expense.setExpenseType(updateExpenseRequestDto.getExpenseType());
         if(updateExpenseRequestDto.getAmount() != null) expense.setAmount(updateExpenseRequestDto.getAmount());
         if(updateExpenseRequestDto.getDate() != null) expense.setDate(updateExpenseRequestDto.getDate());
+        expense.setRecordDateTime(LocalDateTime.now());
 
         expenseRepository.save(expense);
 

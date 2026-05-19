@@ -13,8 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TripService {
@@ -23,25 +24,34 @@ public class TripService {
     private final DriverService driverService;
     private final VehicleService vehicleService;
     private final UserService userService;
+    private final WhatsAppSmsSender whatsAppSmsSenderService;
+    private final OwnerService ownerService;
 
     @Autowired
-    public TripService(TripRepository tripRepository, DriverService driverService, VehicleService vehicleService, UserService userService){
+    public TripService(TripRepository tripRepository,
+                       DriverService driverService,
+                       VehicleService vehicleService,
+                       UserService userService,
+                       WhatsAppSmsSender whatsAppSmsSenderService,
+                       OwnerService ownerService){
         this.tripRepository = tripRepository;
         this.driverService = driverService;
         this.vehicleService = vehicleService;
         this.userService = userService;
+        this.whatsAppSmsSenderService = whatsAppSmsSenderService;
+        this.ownerService = ownerService;
     }
 
     @Transactional
     public TripResponseDto  createTrip(TripRequestDto tripRequestDto, long userId){
         Driver driver = driverService.getDriverById(tripRequestDto.getDriverId());
         Vehicle vehicle = vehicleService.getVehicleByNumber(tripRequestDto.getVehicleNumber());
-        User owner = userService.getUserById(userId);
+        User user = userService.getUserById(userId);
 
         Trip trip = Trip.builder()
                 .driver(driver)
                 .vehicle(vehicle)
-                .user(owner)
+                .user(user)
                 .source(tripRequestDto.getSource())
                 .destination(tripRequestDto.getDestination())
                 .freightPrice(tripRequestDto.getFreightPrice())
@@ -49,16 +59,26 @@ public class TripService {
                 .endDate(tripRequestDto.getEndDate())
                 .status(Status.ACTIVE)
                 .ownerRate(tripRequestDto.getOwnerRate())
-                .ownerAdvance(tripRequestDto.getOwnerAdvance())
+                .recordDateTime(LocalDateTime.now())
+//                .ownerAdvance(tripRequestDto.getOwnerAdvance())
                 .build();
 
+        //Synchronizing Entities
         trip = tripRepository.save(trip);
         vehicle.getTripList().add(trip);
-        owner.getTripList().add(trip);
+        user.getTripList().add(trip);
         driver.getTripList().add(trip);
-        return getTripResponse(trip);
-    }
 
+        //increasing ownerBalance
+        Owner owner = ownerService.getOwnerByVehicleNumber(tripRequestDto.getVehicleNumber());
+        owner.setAmountToReceive(owner.getAmountToReceive() + tripRequestDto.getOwnerRate());
+
+        //Sending Whatsapp mssg
+        TripResponseDto tripResponseDto = getTripResponse(trip);
+        whatsAppSmsSenderService.tripCreatedConfirmation(tripResponseDto);
+        return tripResponseDto;
+
+    }
 
     public TripResponseDto getTripResponseById(long tripId) throws RuntimeException{
         Optional<Trip> tripOptional = tripRepository.findById(tripId);
@@ -119,11 +139,20 @@ public class TripService {
         return trip.getExpenseList().stream().filter(t -> t.getExpenseType().equals(expenseType)).mapToLong(Expense::getAmount).sum();
     }
 
+    public List<MiniTripResponseDto> getTripsOfUser(Long userId) {
+        List<Trip> trips = tripRepository.findByUserId(userId);
+        List<MiniTripResponseDto> activeTrips = trips.stream().filter(t -> t.getStatus().equals(Status.ACTIVE)).map(this::getMiniTripResponse).collect(Collectors.toList());
+        List<MiniTripResponseDto> completedTrips = trips.stream().filter(t -> t.getStatus().equals(Status.COMPLETED)).map(this::getMiniTripResponse).collect(Collectors.toList());
+        List<MiniTripResponseDto> createdTrips = trips.stream().filter(t -> t.getStatus().equals(Status.CREATED)).map(this::getMiniTripResponse).collect(Collectors.toList());
+        activeTrips.sort(Comparator.comparing(MiniTripResponseDto::getEndDate).reversed());
+        completedTrips.sort(Comparator.comparing(MiniTripResponseDto::getEndDate).reversed());
+        createdTrips.sort(Comparator.comparing(MiniTripResponseDto::getStartDate).reversed());
 
-    public List<MiniTripResponseDto> getTripsOfOwner(Long userId) {
-        List<Trip> trips = tripRepository.findAll();
-        return trips.stream().filter(t -> t.getUser().getId().equals(userId)).map(this::getMiniTripResponse).toList();
+        List<MiniTripResponseDto> res = new ArrayList<>(activeTrips);
+        res.addAll(createdTrips);
+        res.addAll(completedTrips);
 
+        return res;
     }
 
     private TripResponseDto getTripResponse(Trip trip){
@@ -173,14 +202,11 @@ public class TripService {
         Trip trip = getTripById(tripId);
         trip.setStatus(Status.COMPLETED);
         trip = tripRepository.save(trip);
+        whatsAppSmsSenderService.closeTrip(getMiniTripResponse(trip));
         return TripStatusResponseDto.builder()
                 .tripId(tripId)
                 .status(trip.getStatus())
                 .build();
-    }
-
-    public List<Trip> getCompletedTripsByVehicleIds(List<Long> vehicleIds) {
-        return tripRepository.findCompletedTripsByVehicleIds(vehicleIds);
     }
 
     public List<Expense> getByIdIn(List<Long> tripIds) {
@@ -191,26 +217,13 @@ public class TripService {
         return tripRepository.getTripsByUserIdAndOwnerId(userId, ownerId);
     }
 
-    public List<Trip> getCompletedTripsByOwnerIdAndUserId(Long ownerId, Long userId) {
-        return tripRepository.getCompletedTripsByOwnerIdAndUserId(ownerId, userId);
-    }
-
-    public Integer totalActiveTripsCount(Long userId) {
-        return tripRepository.findByUserId(userId).size();
-    }
-
     public List<Trip> getTripByUserId(Long userId){
         return tripRepository.findByUserId(userId);
-    }
-
-    public List<Trip> getActiveTripsByUserId(Long userId){
-        return tripRepository.findActiveTripsByUserId(userId);
     }
 
     public void settleTripPayment(long tripId, long userId) {
         Trip trip = getTripByIdAndUserId(tripId, userId);
         trip.setSettled(true);
-        trip.setOwnerAdvance(trip.getOwnerRate());
         tripRepository.save(trip);
     }
 

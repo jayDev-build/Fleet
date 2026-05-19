@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity(name = "transactions")
 @NoArgsConstructor
@@ -47,5 +48,7 @@ public class Transactions {
     @ManyToOne
     @NotNull
     private User user;
+
+    private LocalDateTime recordDateTime;
 
 }

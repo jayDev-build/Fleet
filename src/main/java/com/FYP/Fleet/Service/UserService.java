@@ -76,12 +76,6 @@ public class UserService {
         // Estimated Profit = What we expect minus what we've already spent
         Long estimatedProfit = activeFreight - activeExpenses - activeOwnerRate;
 
-        // --- OWNER SETTLEMENT (Crucial for Fleet Management) ---
-        // Amount to pay should include ALL trips where money is still owed
-        Long totalOwnerRate = allTrips.stream().mapToLong(t -> nvl(t.getOwnerRate())).sum();
-        Long totalOwnerAdvance = allTrips.stream().mapToLong(t -> nvl(t.getOwnerAdvance())).sum();
-        Long totalAmountToPay = totalOwnerRate - totalOwnerAdvance;
-
         return UserBalanceResponseDto.builder()
                 .totalActiveTrips(activeTrips.size())
                 .totalTrips(allTrips.size())
@@ -104,11 +98,5 @@ public class UserService {
         return val == null ? 0L : val;
     }
 
-    private Long sumByType(List<Expense> expenses, ExpenseType type) {
-        return expenses.stream()
-                .filter(e -> e.getExpenseType() == type)
-                .mapToLong(Expense::getAmount)
-                .sum();
-    }
 
 }
