@@ -21,6 +21,10 @@ public class SecurityUser implements UserDetails {
         return user.getUsername();
     }
 
+    public String phoneNumber(){
+        return user.getPhone();
+    }
+
     @Override
     public String getPassword() {
         return user.getPassword();

@@ -29,13 +29,16 @@ public class UserService {
 
     public UserResponseDto createUser(UserRequestDto userRequestDto, long userId){
         User user = userRepository.findById(userId).orElseThrow(()->new  UsernameNotFoundException("UserId is invalid"));
-        user.setName(userRequestDto.getName());
-        user.setPhone(userRequestDto.getPhone());
+        if(userRequestDto.getName() != null) user.setName(userRequestDto.getName());
+        if(userRequestDto.getPhone() != null) user.setPhone(userRequestDto.getPhone());
+        if(userRequestDto.getCompanyName() != null) user.setCompanyName(userRequestDto.getCompanyName());
+        if(userRequestDto.getCity() != null) user.setCity(userRequestDto.getCity());
+        if(userRequestDto.getState() != null) user.setState(userRequestDto.getState());
         user = userRepository.save(user);
         return getUserResponse(user);
     }
 
-    public UserResponseDto getUserResponseById(long userId) {
+    public UserResponseDto getUserResponseById(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User do not exist"));
         return getUserResponse(user);
 
@@ -50,6 +53,9 @@ public class UserService {
                 .userId(user.getId())
                 .name(user.getName())
                 .phone(user.getPhone())
+                .companyName(user.getCompanyName() != null ? user.getCompanyName() : "")
+                .city(user.getCity() != null ? user.getCity() : "")
+                .state(user.getState() != null ? user.getState() : "")
                 .vehicleList(user.getVehicleList().stream().map(Vehicle::getNumber).toList())
                 .driverList(user.getDriverList().stream().map(Driver::getName).toList())
                 .tripList(user.getTripList().stream().map(Trip::getId).toList())
