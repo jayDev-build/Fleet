@@ -55,9 +55,15 @@ public class TripController {
     }
 
     @PatchMapping("/status/{tripId}/close")
-    public ResponseEntity<TripStatusResponseDto> closeTrip(@PathVariable long tripId){
-        TripStatusResponseDto responseDto = tripService.closeTrip(tripId);
+    public ResponseEntity<TripStatusResponseDto> closeTrip(@PathVariable long tripId, @AuthenticationPrincipal SecurityUser securityUser){
+        TripStatusResponseDto responseDto = tripService.closeTrip(tripId, securityUser.getId());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @PatchMapping("/status/{tripId}/start")
+    public ResponseEntity.BodyBuilder startTrip(@PathVariable long tripId, @AuthenticationPrincipal SecurityUser securityUser){
+        tripService.startTrip(tripId, securityUser.getId());
+        return ResponseEntity.status(HttpStatus.OK);
     }
 
     @PatchMapping("/{tripId}/settle")

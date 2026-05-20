@@ -57,7 +57,7 @@ public class TripService {
                 .freightPrice(tripRequestDto.getFreightPrice())
                 .startDate(tripRequestDto.getStartDate())
                 .endDate(tripRequestDto.getEndDate())
-                .status(Status.ACTIVE)
+                .status(Status.CREATED)
                 .ownerRate(tripRequestDto.getOwnerRate())
                 .recordDateTime(LocalDateTime.now())
 //                .ownerAdvance(tripRequestDto.getOwnerAdvance())
@@ -75,7 +75,7 @@ public class TripService {
 
         //Sending Whatsapp mssg
         TripResponseDto tripResponseDto = getTripResponse(trip);
-        whatsAppSmsSenderService.tripCreatedConfirmation(tripResponseDto);
+        whatsAppSmsSenderService.tripCreatedConfirmation(tripResponseDto, user.getPhone());
         return tripResponseDto;
 
     }
@@ -198,7 +198,7 @@ public class TripService {
                 .build();
     }
 
-    public TripStatusResponseDto closeTrip(long tripId) {
+    public TripStatusResponseDto closeTrip(long tripId, long userId) {
         Trip trip = getTripById(tripId);
         trip.setStatus(Status.COMPLETED);
         trip = tripRepository.save(trip);
@@ -229,5 +229,15 @@ public class TripService {
 
     public Trip getTripByIdAndUserId(long tripId, long userId){
         return tripRepository.findByIdAndUserId(tripId, userId).orElseThrow(() -> new RuntimeException("Trip Not Found"));
+    }
+
+    public void startTrip(long tripId, Long id) {
+        Trip trip = getTripByIdAndUserId(tripId, id);
+        trip.setStatus(Status.ACTIVE);
+        tripRepository.save(trip);
+    }
+
+    public List<Trip> findTripsWhereLastExpenseIsOlderThan24Hours(){
+        return tripRepository.findTripsWhereLastExpenseIsOlderThan24Hours(LocalDateTime.now().minusHours(24));
     }
 }

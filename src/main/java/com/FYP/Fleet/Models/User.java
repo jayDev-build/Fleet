@@ -2,6 +2,7 @@ package com.FYP.Fleet.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -39,10 +40,18 @@ public class User {
     @NotNull
     private String username;
 
-
     @Column(name = "password")
     @NotNull
     private String password;
+
+    @Column(name = "company_name")
+    private String companyName;
+
+    @Column(name = "city")
+    private String city;
+
+    @Column(name = "state")
+    private String state;
 
     @OneToMany( mappedBy = "user", cascade = CascadeType.ALL)
     @Builder.Default

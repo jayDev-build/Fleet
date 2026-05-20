@@ -20,4 +20,5 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
             and e.trip.user.id = :userId\s
             """)
     Optional<Expense> findByIdAndUserId(@Param("expenseId") long expenseId, @Param("userId") Long userId);
+
 }

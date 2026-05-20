@@ -22,13 +22,13 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/")
+    @PostMapping("/profile/update")
     public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto userRequestDto, @AuthenticationPrincipal SecurityUser securityUser){
         UserResponseDto user = userService.createUser(userRequestDto, securityUser.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
-    @GetMapping("/")
+    @GetMapping("/profile")
     public ResponseEntity<UserResponseDto> getUserById(@AuthenticationPrincipal SecurityUser securityUser){
         UserResponseDto userResponseDto = userService.getUserResponseById(securityUser.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);

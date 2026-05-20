@@ -58,7 +58,7 @@ public class TransactionService {
         TransactionResponseDto responseDto = generateTransactionResponse(transactions);
 
         //sending whatsapp update
-        whatsAppSmsSenderService.addTransaction(responseDto, userId, owner.getAmountToReceive());
+        whatsAppSmsSenderService.addTransaction(responseDto, owner.getAmountToReceive(), user.getPhone());
         return responseDto;
     }
 

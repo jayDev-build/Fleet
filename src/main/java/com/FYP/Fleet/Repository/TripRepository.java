@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -57,4 +58,15 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     List<Trip> getTripsByUserIdAndOwnerId(@Param("userId")Long userId, @Param("ownerId") Long ownerId);
 
     Optional<Trip> findByIdAndUserId(long tripId, long userId);
+
+    @Query("""
+    SELECT t FROM Trip t 
+    WHERE t.status = com.FYP.Fleet.Enums.Status.ACTIVE 
+    AND (
+        SELECT MAX(e.recordDateTime) 
+        FROM Expense e 
+        WHERE e.trip = t
+    ) < :boundaryTime
+""")
+    List<Trip> findTripsWhereLastExpenseIsOlderThan24Hours(@Param("boundaryTime") LocalDateTime boundaryTime);
 }
