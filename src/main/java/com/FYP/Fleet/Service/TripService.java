@@ -236,4 +236,8 @@ public class TripService {
         trip.setStatus(Status.ACTIVE);
         tripRepository.save(trip);
     }
+
+    public List<Trip> findTripsWhereLastExpenseIsOlderThan24Hours(){
+        return tripRepository.findTripsWhereLastExpenseIsOlderThan24Hours(LocalDateTime.now().minusHours(24));
+    }
 }

@@ -4,6 +4,7 @@ import com.FYP.Fleet.Dto.MiniResponseDto.MiniTripResponseDto;
 import com.FYP.Fleet.Dto.Response.TransactionResponseDto;
 import com.FYP.Fleet.Dto.Response.TripResponseDto;
 import com.FYP.Fleet.Models.SecurityUser;
+import com.FYP.Fleet.Models.Trip;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
@@ -69,9 +70,17 @@ public class WhatsAppSmsSender {
         sendMessage(toPhone, "HXab010234c620051167503ba07c89642f", variables);
     }
 
+    public void expenseLogRemind(String source, String destination, long id, String userPhoneNumber){
+        String variables = String.format(
+                "{\"1\":\"%s\",\"2\":\"%s\",\"3\":\"%s\"}",
+                source,
+                destination,
+                id
+        );
+        sendMessage(userPhoneNumber, "HX07d9892323faa730276ecde18f4afbd6", variables);
+    }
+
     private void sendMessage(String userPhoneNumber, String templateSid, String jsonVariables ){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
         Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
         System.out.println("userPhoneNumber: " + userPhoneNumber);
         try {
