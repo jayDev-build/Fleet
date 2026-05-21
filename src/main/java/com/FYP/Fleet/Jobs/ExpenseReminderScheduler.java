@@ -26,6 +26,7 @@ public class ExpenseReminderScheduler {
     @Scheduled(cron = "0 0 9-21 * * ?")
     public void tripsWhereLastExpenseIsOlderThan24Hours(){
         List<Trip> trips = tripService.findTripsWhereLastExpenseIsOlderThan24Hours();
+        System.out.println(trips);
         for(Trip t : trips){
             whatsAppSmsSenderService.expenseLogRemind(
                     t.getSource(),
