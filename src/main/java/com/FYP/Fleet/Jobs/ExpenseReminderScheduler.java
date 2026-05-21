@@ -1,14 +1,11 @@
 package com.FYP.Fleet.Jobs;
 
 import com.FYP.Fleet.Models.Trip;
-import com.FYP.Fleet.Models.User;
 import com.FYP.Fleet.Service.TripService;
-import com.FYP.Fleet.Service.UserService;
 import com.FYP.Fleet.Service.WhatsAppSmsSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 
 @Component

@@ -1,12 +1,14 @@
 package com.FYP.Fleet.Dto.Request;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
-@Setter
 public class LoginRequestDto {
 
     private String username;

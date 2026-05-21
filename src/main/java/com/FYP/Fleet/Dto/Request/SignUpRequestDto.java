@@ -1,11 +1,12 @@
 package com.FYP.Fleet.Dto.Request;
 
-import lombok.*;
-import org.springframework.stereotype.Service;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @Builder
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class SignUpRequestDto {

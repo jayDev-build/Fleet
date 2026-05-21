@@ -1,7 +1,6 @@
 package com.FYP.Fleet.Repository;
 
 import com.FYP.Fleet.Models.Owner;
-import com.FYP.Fleet.Models.Transactions;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

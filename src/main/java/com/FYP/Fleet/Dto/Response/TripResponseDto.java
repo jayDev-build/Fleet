@@ -2,8 +2,11 @@ package com.FYP.Fleet.Dto.Response;
 
 import com.FYP.Fleet.Enums.Status;
 import com.FYP.Fleet.Models.Expense;
-import lombok.*;
-
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;

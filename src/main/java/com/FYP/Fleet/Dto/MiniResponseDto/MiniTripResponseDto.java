@@ -1,8 +1,11 @@
 package com.FYP.Fleet.Dto.MiniResponseDto;
 
 import com.FYP.Fleet.Enums.Status;
-import lombok.*;
-
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import java.time.LocalDate;
 
 @Builder
