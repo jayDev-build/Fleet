@@ -1,13 +1,14 @@
 package com.FYP.Fleet.Dto.Request;
 
 import com.FYP.Fleet.Enums.Method;
-import lombok.*;
-
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import java.time.LocalDate;
 
 @Builder
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransactionRequestDto {

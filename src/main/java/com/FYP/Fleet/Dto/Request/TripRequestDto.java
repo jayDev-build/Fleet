@@ -1,12 +1,15 @@
 package com.FYP.Fleet.Dto.Request;
-import lombok.*;
+
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import java.time.LocalDate;
 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 public class TripRequestDto {
 
     private long driverId;

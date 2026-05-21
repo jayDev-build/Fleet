@@ -1,9 +1,10 @@
 package com.FYP.Fleet.Dto.Response;
 
-import com.FYP.Fleet.Dto.MiniResponseDto.MiniTripResponseDto;
-import lombok.*;
-
-import java.util.List;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter

@@ -1,6 +1,10 @@
 package com.FYP.Fleet.Dto.Response;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import java.util.List;
 
 @Builder

@@ -4,7 +4,6 @@ import com.FYP.Fleet.Dto.MiniResponseDto.MiniTripResponseDto;
 import com.FYP.Fleet.Dto.Response.TransactionResponseDto;
 import com.FYP.Fleet.Dto.Response.TripResponseDto;
 import com.FYP.Fleet.Models.SecurityUser;
-import com.FYP.Fleet.Models.Trip;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
@@ -36,7 +35,7 @@ public class WhatsAppSmsSender {
                 createdTrip.getId()
         );
 
-        sendMessage(toPhoneNumber, "HX379348e407ddf79bd373553733d1188c", variables);
+        sendMessage(toPhoneNumber, "HXe03463259b6926216df93d2675c8e443", variables);
     }
 
     public void closeTrip(MiniTripResponseDto tripResponseDto){
@@ -52,7 +51,7 @@ public class WhatsAppSmsSender {
         );
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
-        sendMessage(securityUser.phoneNumber(),"HX450975eed32c7800e2fd04190bc0b323", variables);
+        sendMessage(securityUser.phoneNumber(),"HXe56d7af1dc61471bfe4bb4c9c57830ec", variables);
     }
 
     public void addTransaction(TransactionResponseDto responseDto, Long ownerBalance, String toPhone){
@@ -82,7 +81,6 @@ public class WhatsAppSmsSender {
 
     private void sendMessage(String userPhoneNumber, String templateSid, String jsonVariables ){
         Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
-        System.out.println("userPhoneNumber: " + userPhoneNumber);
         try {
             Message message = Message.creator(
                             new PhoneNumber("whatsapp:+91" + userPhoneNumber),
@@ -93,9 +91,9 @@ public class WhatsAppSmsSender {
                     .setContentVariables(jsonVariables) // Must be a JSON string format: {"1":"val1", "2":"val2"}
                     .create();
 
-            System.out.println("Notification sent successfully! SID: " + message.getSid());
+            log.info("Notification sent successfully! SID: {}", message.getSid());
         } catch (Exception e) {
-            System.err.println("Failed to send WhatsApp alert: " + e.getMessage());
+            log.info("Failed to send WhatsApp alert: {}", e.getMessage());
         }
 
     }
