@@ -1,6 +1,7 @@
 package com.FYP.Fleet.Security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,6 +18,9 @@ import java.util.List;
 public class WebSecurityConfig  {
 
     private final AuthFilter authFilter;
+
+    @Value("${frontend.url}")
+    private String frontendURL;
 
     @Autowired
     public WebSecurityConfig(AuthFilter authFilter){
@@ -41,7 +45,7 @@ public class WebSecurityConfig  {
     @Bean
     CorsConfigurationSource  corsConfigurationSource(){
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173", "http://192.168.116.1:5173", "http://192.168.153.1:5173"," http://192.168.1.6:5173", "http://localhost:8080"));
+        corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173",frontendURL));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "OPTIONS", "DELETE"));
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setAllowedHeaders(List.of("*"));
