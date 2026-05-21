@@ -95,11 +95,13 @@ public class OwnerService {
         dto.setOwnerId(owner.getId());
         dto.setName(owner.getName());
         dto.setPhone(owner.getPhone());
-        dto.setVehicleNumbers(
-                owner.getVehicles().stream()
-                        .map(Vehicle::getNumber)
-                        .collect(Collectors.toList())
-        );
+        if(owner.getVehicles() != null) {
+            dto.setVehicleNumbers(
+                    owner.getVehicles().stream()
+                            .map(Vehicle::getNumber)
+                            .collect(Collectors.toList())
+            );
+        }
         return dto;
     }
 
