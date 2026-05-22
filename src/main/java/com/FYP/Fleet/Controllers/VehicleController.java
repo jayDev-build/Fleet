@@ -48,14 +48,16 @@ public class VehicleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Vehicle> getVehicleById(@PathVariable long id) {
-        Vehicle vehicle = vehicleService.getVehicleById(id);
+    public ResponseEntity<Vehicle> getVehicleById(@PathVariable long id, @AuthenticationPrincipal SecurityUser securityUser) {
+        Vehicle vehicle = vehicleService.getVehicleById(id, securityUser.getId());
         return ResponseEntity.status(HttpStatus.OK).body(vehicle);
     }
 
     @PatchMapping("/{vehicleId}")
-    public ResponseEntity<VehicleResponseDto> updateVehicle(@PathVariable long vehicleId,@RequestBody VehicleRequestDto vehicleRequestDto) throws UserPrincipalNotFoundException {
-        VehicleResponseDto responseDto = vehicleService.updateVehicle(vehicleId, vehicleRequestDto);
+    public ResponseEntity<VehicleResponseDto> updateVehicle(@PathVariable long vehicleId,
+                                                            @RequestBody VehicleRequestDto vehicleRequestDto,
+                                                            @AuthenticationPrincipal SecurityUser securityUser) throws UserPrincipalNotFoundException {
+        VehicleResponseDto responseDto = vehicleService.updateVehicle(vehicleId, vehicleRequestDto, securityUser.getId());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 

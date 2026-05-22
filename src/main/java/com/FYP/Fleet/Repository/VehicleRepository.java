@@ -4,6 +4,7 @@ import com.FYP.Fleet.Models.Vehicle;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.lang.ScopedValue;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,4 +17,5 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
     Optional<Vehicle> findByNumberAndUserId(String number, Long userId);
 
 
+    Optional<Vehicle> findByIdAndUserId(long id, long userId);
 }
