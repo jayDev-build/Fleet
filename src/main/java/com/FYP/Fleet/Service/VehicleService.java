@@ -52,11 +52,18 @@ public class VehicleService {
 
     }
 
-    public VehicleResponseDto getVehicleByVehicleNumber(String number){
-        Vehicle vehicle = getVehicleByNumber(number);
+    public VehicleResponseDto getVehicleResponseByVehicleNumber(String number, long userId){
+        Vehicle vehicle = vehicleRepository.findByNumberAndUserId(number, userId)
+                .orElseThrow(()-> new RuntimeException("Vehicle Do Not Exist"));
         return getVehicleResponse(vehicle);
 
     }
+
+    public Vehicle getVehicleByVehicleNumber(String number, long userId){
+        return vehicleRepository.findByNumberAndUserId(number, userId)
+                .orElseThrow(()-> new RuntimeException("Vehicle Do Not Exist"));
+    }
+
 
     public VehicleResponseDto updateVehicle( long vehicleId, VehicleRequestDto vehicleRequestDto) throws UserPrincipalNotFoundException {
         Vehicle vehicle = getVehicleById(vehicleId);
@@ -74,12 +81,6 @@ public class VehicleService {
     public Vehicle getVehicleById(long id){
         return vehicleRepository.findById(id).orElseThrow(
                 ()-> new RuntimeException("Vehicle Id Do Not Exist")
-        );
-    }
-
-    public Vehicle getVehicleByNumber(String number){
-        return vehicleRepository.findByNumber(number).orElseThrow(
-                ()-> new RuntimeException("Vehicle Number Do Not Exist")
         );
     }
 

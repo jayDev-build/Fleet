@@ -53,6 +53,10 @@ public class AuthService {
         User user = userRepository.findByUsername(loginRequestDto.getUsername()).orElseThrow(
                 ()-> new UsernameNotFoundException("UserName Is Invalid"));
 
+        if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
+
         SecurityUser securityUser = new SecurityUser(user);
         String jwt = authUtils.generateToken(securityUser);
 

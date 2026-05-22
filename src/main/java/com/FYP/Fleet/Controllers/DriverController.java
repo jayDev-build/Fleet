@@ -36,7 +36,7 @@ public class DriverController {
 
     @GetMapping("/")
     public ResponseEntity<List<DriverResponseDto>> getAllDriverOfUser(@AuthenticationPrincipal SecurityUser securityUser){
-        List<DriverResponseDto> driverList = driverService.getAllDriverOfOwner(securityUser.getId());
+        List<DriverResponseDto> driverList = driverService.getAllDriverOfUser(securityUser.getId());
         return ResponseEntity.status(HttpStatus.OK).body(driverList);
     }
 

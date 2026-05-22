@@ -45,9 +45,6 @@ public class Owner {
     @Column(nullable = false)
     private String phone;
 
-    @Builder.Default
-    private Long amountToReceive = 0L;
-
     // Which fleet operator manages this owner
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

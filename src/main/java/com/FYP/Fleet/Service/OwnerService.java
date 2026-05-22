@@ -43,20 +43,20 @@ public class OwnerService {
                 .build();
 
         Owner saved = ownerRepository.save(owner);
-        return mapToResponse(saved);
+        return mapToResponse(saved, userId);
     }
 
     public List<OwnerResponseDto> getAllOwners(Long userId) {
         return ownerRepository.findByUserId(userId)
                 .stream()
-                .map(this::mapToResponse)
+                .map(o -> mapToResponse(o, userId))
                 .collect(Collectors.toList());
     }
 
     public OwnerResponseDto getOwner(Long ownerId, Long userId) {
         Owner owner = ownerRepository.findByIdAndUserId(ownerId, userId)
                 .orElseThrow(() -> new RuntimeException("Owner not found"));
-        return mapToResponse(owner);
+        return mapToResponse(owner, userId);
     }
 
     public OwnerBalanceDto getOwnerBalance(Long ownerId, Long userId) {
@@ -90,11 +90,13 @@ public class OwnerService {
         return dto;
     }
 
-    private OwnerResponseDto mapToResponse(Owner owner) {
+    private OwnerResponseDto mapToResponse(Owner owner, long userId) {
         OwnerResponseDto dto = new OwnerResponseDto();
         dto.setOwnerId(owner.getId());
         dto.setName(owner.getName());
         dto.setPhone(owner.getPhone());
+        dto.setAmountToReceive(getOwnerBalance(owner.getId(),userId).getAmountToPay());
+
         if(owner.getVehicles() != null) {
             dto.setVehicleNumbers(
                     owner.getVehicles().stream()
@@ -121,29 +123,9 @@ public class OwnerService {
         return ownerRepository.findById(ownerId).orElseThrow(()-> new UserPrincipalNotFoundException("Owner Id Invalid"));
     }
 
-    public Owner getOwnerByVehicleNumber(String vehicleNumber){
-        return ownerRepository.findByVehicleNumber(vehicleNumber);
-    }
-    private TripSummaryDto mapToTripSummary(Trip trip) {
-        Long totalExpense = trip.getExpenseList().stream().mapToLong(Expense::getAmount).sum();
-        return TripSummaryDto.builder()
-                .tripId(trip.getId())
-                .vehicleNumber(trip.getVehicle().getNumber())
-                .source(trip.getSource())
-                .destination(trip.getDestination())
-                .startDate(trip.getStartDate())
-                .endDate(trip.getEndDate())
-                .freightPrice(trip.getFreightPrice())
-                .totalExpense(totalExpense)
-                .profit(trip.getFreightPrice() - totalExpense)
-                .status(trip.getStatus())
-                .build();
+    public Owner getOwnerByVehicleNumberAndUserId(String vehicleNumber, Long userId){
+        return ownerRepository.findByVehicleNumberAndUserId(vehicleNumber, userId);
     }
 
-    private long sumByType(List<Expense> expenses, ExpenseType type) {
-        return expenses.stream()
-                .filter(e -> e.getExpenseType() == type)
-                .mapToLong(Expense::getAmount)
-                .sum();
-    }
+
 }

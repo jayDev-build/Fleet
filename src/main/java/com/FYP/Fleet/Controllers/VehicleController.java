@@ -42,8 +42,8 @@ public class VehicleController {
     }
 
     @GetMapping("/number/{number}")
-    public ResponseEntity<VehicleResponseDto> getVehicleByNumber(@PathVariable String number) {
-        VehicleResponseDto vehicle = vehicleService.getVehicleByVehicleNumber(number);
+    public ResponseEntity<VehicleResponseDto> getVehicleByNumber(@PathVariable String number, @AuthenticationPrincipal SecurityUser securityUser) {
+        VehicleResponseDto vehicle = vehicleService.getVehicleResponseByVehicleNumber(number, securityUser.getId());
         return ResponseEntity.status(HttpStatus.OK).body(vehicle);
     }
 
