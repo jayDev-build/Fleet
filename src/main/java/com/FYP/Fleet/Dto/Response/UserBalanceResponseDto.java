@@ -12,6 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class UserBalanceResponseDto {
+    private String username;
     private Integer totalTrips;
     private Integer totalActiveTrips;
     private Long totalFreightEarned;
