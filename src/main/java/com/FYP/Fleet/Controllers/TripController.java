@@ -36,8 +36,8 @@ public class TripController {
     }
 
     @GetMapping("/{tripId}")
-    public ResponseEntity<TripResponseDto> getTrip(@PathVariable long tripId){
-        TripResponseDto trip = tripService.getTripResponseById(tripId);
+    public ResponseEntity<TripResponseDto> getTrip(@PathVariable long tripId, @AuthenticationPrincipal SecurityUser securityUser){
+        TripResponseDto trip = tripService.getTripResponseById(tripId, securityUser.getId());
         return ResponseEntity.status(HttpStatus.OK).body(trip);
     }
 

@@ -67,4 +67,15 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     ) < :boundaryTime
 """)
     List<Trip> findTripsWhereLastExpenseIsOlderThan24Hours(@Param("boundaryTime") LocalDateTime boundaryTime);
+
+    @Query("""
+    SELECT COALESCE(SUM(t.ownerRate), 0L) 
+    FROM Trip t 
+    WHERE t.user.id = :userId 
+    AND t.vehicle.owner.id = :ownerId 
+""")
+    Long sumOwnerRateByUserIdAndOwnerId(
+            @Param("userId") Long userId,
+            @Param("ownerId") Long ownerId
+    );
 }

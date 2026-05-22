@@ -49,16 +49,13 @@ public class TransactionService {
                 .recordDateTime(LocalDateTime.now())
                 .build();
 
-        //reduce owner's amount to receive
-        //transaction Annotation will automatically reduce
-        owner.setAmountToReceive(owner.getAmountToReceive() - transactions.getAmount());
 
         //saving transaction
         transactions = transactionRepository.save(transactions);
         TransactionResponseDto responseDto = generateTransactionResponse(transactions);
 
         //sending whatsapp update
-        whatsAppSmsSenderService.addTransaction(responseDto, owner.getAmountToReceive(), user.getPhone());
+        whatsAppSmsSenderService.addTransaction(responseDto, transactionRepository.sumAmountByUserIdAndOwnerId(userId, owner.getId()), user.getPhone());
         return responseDto;
     }
 

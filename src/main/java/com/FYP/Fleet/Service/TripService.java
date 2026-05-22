@@ -45,7 +45,7 @@ public class TripService {
     @Transactional
     public TripResponseDto  createTrip(TripRequestDto tripRequestDto, long userId){
         Driver driver = driverService.getDriverById(tripRequestDto.getDriverId());
-        Vehicle vehicle = vehicleService.getVehicleByNumber(tripRequestDto.getVehicleNumber());
+        Vehicle vehicle = vehicleService.getVehicleByVehicleNumber(tripRequestDto.getVehicleNumber(), userId);
         User user = userService.getUserById(userId);
 
         Trip trip = Trip.builder()
@@ -70,8 +70,7 @@ public class TripService {
         driver.getTripList().add(trip);
 
         //increasing ownerBalance
-        Owner owner = ownerService.getOwnerByVehicleNumber(tripRequestDto.getVehicleNumber());
-        owner.setAmountToReceive(owner.getAmountToReceive() + tripRequestDto.getOwnerRate());
+        Owner owner = ownerService.getOwnerByVehicleNumberAndUserId(tripRequestDto.getVehicleNumber(), userId);
 
         //Sending Whatsapp mssg
         TripResponseDto tripResponseDto = getTripResponse(trip);
