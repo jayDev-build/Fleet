@@ -32,8 +32,9 @@ public class ExpenseController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<MiniExpenseResponseDto> createExpense(@RequestBody ExpenseRequestDto expenseRequestDto){
-        MiniExpenseResponseDto response = expenseService.createExpense(expenseRequestDto);
+    public ResponseEntity<MiniExpenseResponseDto> createExpense(@RequestBody ExpenseRequestDto expenseRequestDto,
+                                                                @AuthenticationPrincipal SecurityUser securityUser){
+        MiniExpenseResponseDto response = expenseService.createExpense(expenseRequestDto, securityUser.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

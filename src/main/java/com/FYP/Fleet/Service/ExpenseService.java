@@ -34,8 +34,8 @@ public class ExpenseService {
     }
 
     @Transactional
-    public MiniExpenseResponseDto createExpense(ExpenseRequestDto expenseRequestDto){
-        Trip trip = tripService.getTripById(expenseRequestDto.getTripId());
+    public MiniExpenseResponseDto createExpense(ExpenseRequestDto expenseRequestDto, long userId){
+        Trip trip = tripService.getTripByIdAndUserId(expenseRequestDto.getTripId(), userId);
         Expense expense = Expense.builder()
                 .trip(trip)
                 .expenseType(expenseRequestDto.getExpenseType())

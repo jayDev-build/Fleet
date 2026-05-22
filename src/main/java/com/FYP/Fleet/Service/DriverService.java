@@ -50,9 +50,9 @@ public class DriverService {
         );
     }
 
-    public List<DriverResponseDto> getAllDriverOfOwner(Long ownerId) {
-        List<Driver> driverList = driverRepository.findAll();
-        return driverList.stream().filter(d -> d.getUser().getId().equals(ownerId)).map(this :: getDriverResponse).toList();
+    public List<DriverResponseDto> getAllDriverOfUser(Long userId) {
+        List<Driver> driverList = driverRepository.findByUserId(userId);
+        return driverList.stream().filter(d -> d.getUser().getId().equals(userId)).map(this :: getDriverResponse).toList();
     }
 
     private DriverResponseDto getDriverResponse(Driver driver){

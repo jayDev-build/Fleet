@@ -80,8 +80,8 @@ public class TripService {
 
     }
 
-    public TripResponseDto getTripResponseById(long tripId) throws RuntimeException{
-        Optional<Trip> tripOptional = tripRepository.findById(tripId);
+    public TripResponseDto getTripResponseById(long tripId, long userId) throws RuntimeException{
+        Optional<Trip> tripOptional = tripRepository.findByIdAndUserId(tripId, userId);
         if(tripOptional.isEmpty()){
             throw new RuntimeException("Trip Do Not Exist");
         }
