@@ -63,6 +63,7 @@ public class UserService {
     }
 
     public UserBalanceResponseDto getDashboardStats(Long userId) {
+        User user = getUserById(userId);
         List<Trip> allTrips = tripService.getTripByUserId(userId);
 
         // Split by status
@@ -83,6 +84,7 @@ public class UserService {
         Long estimatedProfit = activeFreight - activeExpenses - activeOwnerRate;
 
         return UserBalanceResponseDto.builder()
+                .username(user.getUsername())
                 .totalActiveTrips(activeTrips.size())
                 .totalTrips(allTrips.size())
                 .totalFreightEarned(completedFreight + activeFreight) // Total Booked Pipeline

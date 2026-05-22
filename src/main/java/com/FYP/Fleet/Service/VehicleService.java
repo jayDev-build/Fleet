@@ -65,8 +65,9 @@ public class VehicleService {
     }
 
 
-    public VehicleResponseDto updateVehicle( long vehicleId, VehicleRequestDto vehicleRequestDto) throws UserPrincipalNotFoundException {
-        Vehicle vehicle = getVehicleById(vehicleId);
+    public VehicleResponseDto updateVehicle( long vehicleId, VehicleRequestDto vehicleRequestDto, long userId)
+            throws UserPrincipalNotFoundException {
+        Vehicle vehicle = getVehicleById(vehicleId, userId);
         if(vehicleRequestDto.getOwnerId() != null){
             Owner owner = ownerService.getOwnerById(vehicleRequestDto.getOwnerId());
             vehicle.setOwner(owner);
@@ -78,8 +79,8 @@ public class VehicleService {
         return getVehicleResponse(vehicle);
     }
 
-    public Vehicle getVehicleById(long id){
-        return vehicleRepository.findById(id).orElseThrow(
+    public Vehicle getVehicleById(long id, long userId){
+        return vehicleRepository.findByIdAndUserId(id, userId).orElseThrow(
                 ()-> new RuntimeException("Vehicle Id Do Not Exist")
         );
     }
