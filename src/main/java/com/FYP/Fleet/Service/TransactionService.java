@@ -21,23 +21,21 @@ import java.util.stream.Collectors;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
-    private final OwnerRepository ownerRepository;
+    private final OwnerService ownerService;
     private final UserService userService;
     private final WhatsAppSmsSender whatsAppSmsSenderService;
 
     @Autowired
-    TransactionService(TransactionRepository transactionRepository, OwnerRepository ownerRepository, UserService userService, WhatsAppSmsSender whatsAppSmsSenderService){
+    TransactionService(TransactionRepository transactionRepository, OwnerService ownerService, UserService userService, WhatsAppSmsSender whatsAppSmsSenderService){
         this.transactionRepository = transactionRepository;
-        this.ownerRepository = ownerRepository;
+        this.ownerService = ownerService;
         this.userService = userService;
         this.whatsAppSmsSenderService = whatsAppSmsSenderService;
     }
 
     @Transactional
     public TransactionResponseDto createTransaction(TransactionRequestDto transactionRequestDto, Long userId) throws UserPrincipalNotFoundException {
-        Owner owner = ownerRepository.findByIdAndUserId(transactionRequestDto.getOwnerId(), userId).orElseThrow(
-                ()-> new RuntimeException("Owner Not Found")
-        );
+        Owner owner = ownerService.getByOwnerIdAndUserId(transactionRequestDto.getOwnerId(), userId);
         User user = userService.getUserById(userId);
         Transactions transactions = Transactions.builder()
                 .user(user)
@@ -55,7 +53,7 @@ public class TransactionService {
         TransactionResponseDto responseDto = generateTransactionResponse(transactions);
 
         //sending whatsapp update
-        whatsAppSmsSenderService.addTransaction(responseDto, transactionRepository.sumAmountByUserIdAndOwnerId(userId, owner.getId()), user.getPhone());
+            whatsAppSmsSenderService.addTransaction(responseDto, ownerService.getOwnerBalance(owner.getId(), userId).getAmountToPay(), user.getPhone());
         return responseDto;
     }
 
