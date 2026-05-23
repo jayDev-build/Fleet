@@ -2,9 +2,9 @@ package com.FYP.Fleet.Service;
 
 import com.FYP.Fleet.Dto.Request.OwnerRequestDto;
 import com.FYP.Fleet.Dto.Response.*;
-import com.FYP.Fleet.Enums.ExpenseType;
 import com.FYP.Fleet.Models.*;
 import com.FYP.Fleet.Repository.OwnerRepository;
+import com.FYP.Fleet.Repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -19,14 +19,14 @@ public class OwnerService {
     private final OwnerRepository ownerRepository;
     private final UserService userService;
     private final TripService tripService;
-    private final TransactionService transactionService;
+    private final TransactionRepository transactionRepository;
 
     @Autowired
-    public OwnerService(OwnerRepository ownerRepository, UserService userService,@Lazy TripService tripService, TransactionService transactionService){
+    public OwnerService(OwnerRepository ownerRepository, UserService userService,@Lazy TripService tripService, TransactionRepository transactionRepository){
         this.ownerRepository = ownerRepository;
         this.userService = userService;
         this.tripService = tripService;
-        this.transactionService = transactionService;
+        this.transactionRepository = transactionRepository;
     }
 
     public OwnerResponseDto createOwner(OwnerRequestDto request, Long userId) {
@@ -63,12 +63,12 @@ public class OwnerService {
         Owner owner = ownerRepository.findByIdAndUserId(ownerId, userId)
                 .orElseThrow(() -> new RuntimeException("Owner not found"));
 
-        List<TransactionResponseDto> transactionsList = transactionService.getTransactionByUserIdAndOwnerId(userId, ownerId);
+        List<Transactions> transactionsList = transactionRepository.findTransactionByUserIdAndOwnerId(userId, ownerId);
         List<Trip> trips = tripService
                 .getTripsByUserIdAndOwnerId(userId, ownerId);
 
 
-        long totalAdvance = transactionsList.stream().mapToLong(TransactionResponseDto::getAmount).sum();
+        long totalAdvance = transactionsList.stream().mapToLong(Transactions::getAmount).sum();
         long totalPay = trips.stream().mapToLong(Trip::getOwnerRate).sum();
         long amountToPay = totalPay - totalAdvance;
 
@@ -128,4 +128,8 @@ public class OwnerService {
     }
 
 
+    public Owner getByOwnerIdAndUserId(Long ownerId, Long userId) {
+        return ownerRepository.findByIdAndUserId(ownerId, userId)
+                .orElseThrow(() -> new RuntimeException("Error Do Not Exist"));
+    }
 }
