@@ -9,6 +9,7 @@ import com.FYP.Fleet.Enums.ExpenseType;
 import com.FYP.Fleet.Enums.Status;
 import com.FYP.Fleet.Models.*;
 import com.FYP.Fleet.Repository.TripRepository;
+import com.FYP.Fleet.Whatsapp.WhatsAppNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,22 +25,22 @@ public class TripService {
     private final DriverService driverService;
     private final VehicleService vehicleService;
     private final UserService userService;
-    private final WhatsAppSmsSender whatsAppSmsSenderService;
     private final OwnerService ownerService;
+    private final WhatsAppNotificationService whatsAppNotificationService;
 
     @Autowired
     public TripService(TripRepository tripRepository,
                        DriverService driverService,
                        VehicleService vehicleService,
                        UserService userService,
-                       WhatsAppSmsSender whatsAppSmsSenderService,
-                       OwnerService ownerService){
+                       OwnerService ownerService,
+                       WhatsAppNotificationService whatsAppNotificationService){
         this.tripRepository = tripRepository;
         this.driverService = driverService;
         this.vehicleService = vehicleService;
         this.userService = userService;
-        this.whatsAppSmsSenderService = whatsAppSmsSenderService;
         this.ownerService = ownerService;
+        this.whatsAppNotificationService = whatsAppNotificationService;
     }
 
     @Transactional
@@ -74,7 +75,28 @@ public class TripService {
 
         //Sending Whatsapp mssg
         TripResponseDto tripResponseDto = getTripResponse(trip);
-        whatsAppSmsSenderService.tripCreatedConfirmation(tripResponseDto, user.getPhone());
+//        whatsAppSmsSenderService.tripCreatedConfirmation(tripResponseDto, user.getPhone());
+
+        //Meta
+        List<String> params = List.of(
+                trip.getSource(),
+                trip.getDestination(),
+                trip.getVehicle().getNumber(),
+                trip.getDriver().getName(),
+                trip.getFreightPrice().toString(),
+                String.valueOf(trip.getId())
+        );
+
+        org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
+                new org.springframework.transaction.support.TransactionSynchronizationAdapter() {
+                    @Override
+                    public void afterCommit() {
+                        // This block runs ONLY if the DB saves successfully.
+                        // If you pause at getOwnerBalance or if the DB crashes, this will NEVER execute.
+                        whatsAppNotificationService.sendTemplateMessage(user.getPhone(), "create_trip", "en", params);
+                    }
+                }
+        );
         return tripResponseDto;
 
     }
@@ -198,10 +220,32 @@ public class TripService {
     }
 
     public TripStatusResponseDto closeTrip(long tripId, long userId) {
+        User user = userService.getUserById(userId);
         Trip trip = getTripById(tripId);
         trip.setStatus(Status.COMPLETED);
         trip = tripRepository.save(trip);
-        whatsAppSmsSenderService.closeTrip(getMiniTripResponse(trip));
+        Long totalExpense = trip.getExpenseList().stream().mapToLong(Expense::getAmount).sum();
+//        whatsAppSmsSenderService.closeTrip(getMiniTripResponse(trip));
+
+        List<String> params = List.of(
+                trip.getSource(),
+                trip.getDestination(),
+                trip.getVehicle().getNumber(),
+                trip.getFreightPrice().toString(),
+                trip.getOwnerRate().toString(),
+                String.valueOf(totalExpense),
+                String.valueOf(trip.getFreightPrice() - trip.getOwnerRate() - totalExpense)
+        );
+        org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
+                new org.springframework.transaction.support.TransactionSynchronizationAdapter() {
+                    @Override
+                    public void afterCommit() {
+                        // This block runs ONLY if the DB saves successfully.
+                        // If you pause at getOwnerBalance or if the DB crashes, this will NEVER execute.
+                        whatsAppNotificationService.sendTemplateMessage(user.getPhone(), "complete_trip", "en", params);
+                    }
+                }
+        );
         return TripStatusResponseDto.builder()
                 .tripId(tripId)
                 .status(trip.getStatus())

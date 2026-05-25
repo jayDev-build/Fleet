@@ -7,6 +7,7 @@ import com.FYP.Fleet.Models.Transactions;
 import com.FYP.Fleet.Models.User;
 import com.FYP.Fleet.Repository.OwnerRepository;
 import com.FYP.Fleet.Repository.TransactionRepository;
+import com.FYP.Fleet.Whatsapp.WhatsAppNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,14 +24,17 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final OwnerService ownerService;
     private final UserService userService;
-    private final WhatsAppSmsSender whatsAppSmsSenderService;
+    private final WhatsAppNotificationService whatsAppNotificationService;
 
     @Autowired
-    TransactionService(TransactionRepository transactionRepository, OwnerService ownerService, UserService userService, WhatsAppSmsSender whatsAppSmsSenderService){
+    TransactionService(TransactionRepository transactionRepository,
+                       OwnerService ownerService,
+                       UserService userService,
+                       WhatsAppNotificationService whatsAppNotificationService){
         this.transactionRepository = transactionRepository;
         this.ownerService = ownerService;
         this.userService = userService;
-        this.whatsAppSmsSenderService = whatsAppSmsSenderService;
+        this.whatsAppNotificationService = whatsAppNotificationService;
     }
 
     @Transactional
@@ -53,7 +57,33 @@ public class TransactionService {
         TransactionResponseDto responseDto = generateTransactionResponse(transactions);
 
         //sending whatsapp update
-            whatsAppSmsSenderService.addTransaction(responseDto, ownerService.getOwnerBalance(owner.getId(), userId).getAmountToPay(), user.getPhone());
+//        whatsAppSmsSenderService.addTransaction(responseDto, ownerService.getOwnerBalance(owner.getId(), userId).getAmountToPay(), user.getPhone());
+
+        long balance = ownerService.getOwnerBalance(owner.getId(), userId).getAmountToPay();
+
+        //Meta
+
+
+        List<String> params = List.of(
+                owner.getName(),
+                transactions.getAmount().toString(),
+                transactions.getMethod().name(),
+                !transactions.getNote().isEmpty() ? transactions.getNote() : "no note",
+                owner.getName(),
+                String.valueOf(balance)
+        );
+
+        org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
+                new org.springframework.transaction.support.TransactionSynchronizationAdapter() {
+                    @Override
+                    public void afterCommit() {
+                        // This block runs ONLY if the DB saves successfully.
+                        // If you pause at getOwnerBalance or if the DB crashes, this will NEVER execute.
+                        whatsAppNotificationService.sendTemplateMessage(user.getPhone(), "add_transaction", "en", params);
+                    }
+                }
+        );
+
         return responseDto;
     }
 
