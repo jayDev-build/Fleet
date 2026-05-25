@@ -16,8 +16,8 @@ public class OwnerBalanceDto {
     private Long ownerId;
     private String ownerName;
     private String ownerPhone;
-    private Long totalPay;
-    private Long totalAdvance;
+    private Long totalPaid;
+    private Long totalRent;
     private Long amountToPay;
     private String status; // PAYABLE, RECEIVABLE, SETTLED
     private List<OwnerBalanceTripSummaryResponseDto> trips;
