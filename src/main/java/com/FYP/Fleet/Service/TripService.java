@@ -219,6 +219,7 @@ public class TripService {
                 .build();
     }
 
+    @Transactional
     public TripStatusResponseDto closeTrip(long tripId, long userId) {
         User user = userService.getUserById(userId);
         Trip trip = getTripById(tripId);
