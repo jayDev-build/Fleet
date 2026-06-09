@@ -27,15 +27,15 @@ public class AuthFilter extends OncePerRequestFilter {
         this.userRepository = userRepository;
     }
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        @Override
+        protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        String headerTokens = request.getHeader("Authorization");
+            String headerTokens = request.getHeader("Authorization");
 
-        if(headerTokens == null || !headerTokens.startsWith("Bearer ")){
-            filterChain.doFilter(request, response);
-            return;
-        }
+            if(headerTokens == null || !headerTokens.startsWith("Bearer ")){
+                filterChain.doFilter(request, response);
+                return;
+            }
 
         String token = headerTokens.substring(7).trim();
         String userName = authUtils.getUserNameFromToken(token);
