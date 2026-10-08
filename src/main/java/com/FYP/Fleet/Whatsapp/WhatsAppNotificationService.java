@@ -24,18 +24,21 @@ public class WhatsAppNotificationService {
      * Compiles data contexts and fires a Utility notification message directly via Meta infrastructure.
      */
     public void sendTemplateMessage(String toPhone, String templateName, String langCode, List<String> values) {
+        System.out.println("Token present: " +
+                (accessToken != null && !accessToken.isBlank()));
 
+        System.out.println("Token length: " + accessToken.length());
         // Assemble the single-file mapping container
         WhatsAppPayload payload = new WhatsAppPayload(toPhone, templateName, langCode, values);
 
         // Interpolate target Graph endpoint URI matching your explicit configuration setup
-        String endpointUrl = String.format("%s/%s/messages", apiUrl, phoneNumberId);
+        String endpointUrl = String.format("%s/%s/messages", apiUrl.trim(), phoneNumberId.trim());
 
         try {
             String apiResponse = restClient.post()
                     .uri(endpointUrl)
                     .headers(httpHeaders -> {
-                        httpHeaders.setBearerAuth(accessToken);
+                        httpHeaders.setBearerAuth(accessToken.trim());
                         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
                     })
                     .body(payload)
